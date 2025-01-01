@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Double Hours Calculator</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+            background: linear-gradient(to bottom right, #f5f5f7, #e0e0e0); /* Fallback */
+        }
+
+        /* Container */
+        .container {
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 12px;
+            background-color: #fff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        /* Heading */
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 24px;
+            color: #1d1d1f;
+        }
+
+        /* Label Styling */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #6e6e73;
+        }
+
+        /* Input Styling */
+        input[type="time"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #d1d1d6;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: #f9f9f9;
+            color: #333;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="time"]:focus {
+            border-color: #007aff;
+            background-color: #fff;
+        }
+
+        /* Button Styling */
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #333;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #555;
+            transform: scale(1.02);
+        }
+
+        button:active {
+            background-color: #000;
+            transform: scale(0.98);
+        }
+
+        /* Result Styling */
+        .result {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 18px;
+            color: #1d1d1f;
+        }
+
+        /* Footer Styling */
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #6e6e73;
+        }
+
+        /* Media Query for Smaller Screens */
+        @media (max-width: 480px) {
+            .container {
+                width: 90%;
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            input[type="time"],
+            button {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Double Hours Calculator</h2>
+        <label for="start-time">Start Time:</label>
+        <input type="time" id="start-time" required>
+        <label for="end-time">End Time:</label>
+        <input type="time" id="end-time" required>
+        <button onclick="calculateHours()">Calculate Total Hours</button>
+        <div class="result" id="result"></div>
+    </div>
+    <footer>Created by Alex Gardner</footer>
+
+    <script>
+        function calculateHours() {
+            // Get input values
+            const startTime = document.getElementById("start-time").value;
+            const endTime = document.getElementById("end-time").value;
+
+            if (!startTime || !endTime) {
+                document.getElementById("result").textContent = "Please enter both start and end times.";
+                return;
+            }
+
+            // Parse times
+            const doubleStart = new Date("1970-01-01T23:30:00");
+            const doubleEnd = new Date("1970-01-01T07:30:00");
+            let start = new Date(`1970-01-01T${startTime}`);
+            let end = new Date(`1970-01-01T${endTime}`);
+
+            // Handle crossing midnight
+            if (end < start) {
+                end = new Date(end.getTime() + 24 * 60 * 60 * 1000); // Add one day to end time
+            }
+
+            let doubleHours = 0;
+            let singleHours = 0;
+
+            // Split time into half-hour intervals
+            let current = start;
+            while (current < end) {
+                const nextHalfHour = new Date(current.getTime() + 30 * 60 * 1000); // Add 30 minutes
+                const currentTime = current.getHours() * 60 + current.getMinutes();
+                const doubleStartTime = doubleStart.getHours() * 60 + doubleStart.getMinutes();
+                const doubleEndTime = doubleEnd.getHours() * 60 + doubleEnd.getMinutes();
+
+                // Check if current time falls in the double time range
+                if (
+                    (currentTime >= doubleStartTime && currentTime < 1440) || // Double time before midnight
+                    (currentTime >= 0 && currentTime < doubleEndTime)        // Double time after midnight
+                ) {
+                    doubleHours += 0.5;
+                } else {
+                    singleHours += 0.5;
+                }
+                current = nextHalfHour;
+            }
+
+            // Total hours calculation
+            const totalHours = doubleHours * 2 + singleHours;
+
+            // Display result
+            document.getElementById("result").textContent = `Total Hours: ${totalHours.toFixed(2)}`;
+        }
+    </script>
+</body>
+</html>
